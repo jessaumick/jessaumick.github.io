@@ -19,19 +19,58 @@
       color: red;
     }
     .checked {
-      text-decoration: line-through;
+        text-decoration: line-through;
     }
   </style>
 </head>
 <body>
   <div class="task">
-    <input type="checkbox" id="task1" onclick="saveTaskState(this)"> 
-    <label for="task1" id="label1">Read This Volunteer <a href="https://www.notion.so/a44fab56e8da40dda209d8847ba1ea24?pvs=21" target="_blank">FAQ Page</a> <span class="important">Due ASAP</span></label>
+    <input type="checkbox" id="task1" onclick="saveTaskState()"> 
+    <label for="task1">Read This Volunteer <a href="https://www.notion.so/a44fab56e8da40dda209d8847ba1ea24?pvs=21" target="_blank">FAQ Page</a> <span class="important">Due ASAP</span></label>
   </div>
-  <!-- Other tasks omitted for brevity -->
-  
+  <div class="task">
+    <input type="checkbox" id="task2" onclick="saveTaskState()"> 
+    <label for="task2"><a href="https://form.jotform.com/241615512020137" target="_blank">Confirm</a> Your Volunteer Status <span class="important">Due 2 weeks after receiving acceptance email</span></label>
+  </div>
+  <div class="task">
+    <input type="checkbox" id="task3" onclick="saveTaskState()"> 
+    <label for="task3">Register for <a href="https://www.notion.so/a44fab56e8da40dda209d8847ba1ea24?pvs=21" target="_blank">Zoom Orientation Training</a> <span class="important">Due July 18th</span></label>
+  </div>
+  <div class="task">
+    <input type="checkbox" id="task4" onclick="saveTaskState()"> 
+    <label for="task4">Join <a href="https://www.facebook.com/groups/1461994144059296/" target="_blank">Volunteer Facebook Group</a> <span class="important">encouraged but not required</span></label>
+  </div>
+  <div class="task">
+    <input type="checkbox" id="task5" onclick="saveTaskState()"> 
+    <label for="task5">Select Preferred Shifts <span class="important">Due July 30th</span></label>
+  </div>
+  <div class="task">
+    <input type="checkbox" id="task6" onclick="saveTaskState()"> 
+    <label for="task6">Attend one of the two Zoom Orientation & Training Sessions on either:</label>
+    <ul>
+      <li><span class="important">Wednesday, August 4th</span> 4pm - 8pm Pacific Time</li>
+      <li><span class="important">Friday, August 9th</span> 12pm - 4pm Pacific Time</li>
+    </ul>
+  </div>
+  <div class="task">
+    <input type="checkbox" id="task7" onclick="saveTaskState()"> 
+    <label for="task7">Confirm Ticket Status <span class="important">Due August 9th</span></label>
+  </div>
+  <div class="task">
+    <input type="checkbox" id="task8" onclick="saveTaskState()"> 
+    <label for="task8">Pulse Volunteers (pulse volunteers only) Attend Pulse Team Zoom Orientation <span class="important">TBD</span></label>
+  </div>
+  <div class="task">
+    <input type="checkbox" id="task9" onclick="saveTaskState()"> 
+    <label for="task9">Review Final Schedule <span class="important">Due August 15th</span></label>
+  </div>
+  <div class="task">
+    <input type="checkbox" id="task10" onclick="saveTaskState()"> 
+    <label for="task10">Volunteer Watch Role Training Recorded Video <span class="important">Due August 15th</span></label>
+  </div>
+
   <script>
-    document.addEventListener("DOMContentLoaded", function() {
+ document.addEventListener("DOMContentLoaded", function() {
       document.querySelectorAll("input[type=checkbox]").forEach(function(checkbox) {
         checkbox.checked = localStorage.getItem(checkbox.id) === "true";
         if (checkbox.checked) {
