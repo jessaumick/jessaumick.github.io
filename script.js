@@ -107,10 +107,18 @@ function blockText(text) {
     });
 }
 
+// Array to store correctly guessed words
+let guessedWords = [];
+
 // Handle word guesses
 function guessWord() {
     const guess = document.getElementById('guessBox').value.trim().toLowerCase();
-    const regex = new RegExp(`\\b${guess}\\b`, 'gi');
+    if (!guess || guessedWords.includes(guess)) {
+        return; // If the guess is empty or already guessed, do nothing
+    }
+    
+    guessedWords.push(guess); // Add the new guess to the list of guessed words
+    const regex = new RegExp(`\\b(${guessedWords.join('|')})\\b`, 'gi');
 
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = originalHtml;
@@ -129,7 +137,7 @@ function guessWord() {
     textNodes.forEach(node => {
         const text = node.textContent;
         const blockedText = text.replace(/\b\w+\b/g, (word) => {
-            if (commonWords.includes(word.toLowerCase()) || word.toLowerCase() === guess) {
+            if (commonWords.includes(word.toLowerCase()) || guessedWords.includes(word.toLowerCase())) {
                 return word;
             } else {
                 return '█'.repeat(word.length);
