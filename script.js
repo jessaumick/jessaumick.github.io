@@ -119,8 +119,13 @@ function guessWord() {
         if (element.nodeType === Node.ELEMENT_NODE) {
             Array.from(element.childNodes).forEach(node => {
                 if (node.nodeType === Node.TEXT_NODE) {
-                    const text = node.textContent;
-                    const updatedText = text.replace(regex, (match) => originalHtml.match(new RegExp(`\\b${match}\\b`, 'i'))[0]);
+                    const originalText = originalHtml.substring(node.textContent.length, originalHtml.length);
+                    const updatedText = node.textContent.replace(regex, (match) => {
+                        // Find the corresponding original word and use it to replace the blocked text
+                        const originalWordRegex = new RegExp(`\\b${match}\\b`, 'i');
+                        const originalWordMatch = originalText.match(originalWordRegex);
+                        return originalWordMatch ? originalWordMatch[0] : match;
+                    });
                     node.textContent = updatedText;
                 }
             });
@@ -134,6 +139,7 @@ function guessWord() {
     `;
     document.getElementById('guessBox').value = '';
 }
+
 
 // Handle title guess
 function guessTitle() {
