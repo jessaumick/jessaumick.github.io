@@ -28,21 +28,25 @@ async function fetchArticle() {
         articleTitle = article.title;
         console.log("Random article title:", articleTitle);
 
-        // Fetch the full text of the article
-        const articleResponse = await fetch(`https://en.wikipedia.org/w/api.php?action=parse&page=${articleTitle}&prop=text&format=json&origin=*`);
+        // Fetch the lead section of the article
+        const articleResponse = await fetch(`https://en.wikipedia.org/w/api.php?action=query&titles=${articleTitle}&prop=extracts&exintro&format=json&origin=*`);
         const articleData = await articleResponse.json();
         console.log("Article fetched:", articleData);
 
-        if (!articleData.parse || !articleData.parse.text) {
+        if (!articleData.query || !articleData.query.pages) {
             console.error("Article text not found.");
             document.getElementById('article').innerText = "Article text not found.";
             return;
         }
 
-        const htmlText = articleData.parse.text['*'];
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(htmlText, 'text/html');
-        originalText = doc.body.innerText;
+        const page = Object.values(articleData.query.pages)[0];
+        if (!page.extract) {
+            console.error("Extract not found.");
+            document.getElementById('article').innerText = "Extract not found.";
+            return;
+        }
+
+        originalText = page.extract;
         console.log("Article text:", originalText);
 
         // Block out words and display the article
