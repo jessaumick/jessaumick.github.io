@@ -83,6 +83,12 @@ function guessTitle() {
     }
 }
 
+// Reveal the entire article
+function revealArticle() {
+    document.getElementById('article').innerText = originalText; // Reveal full article
+    document.getElementById('result').innerText = "Article revealed!";
+}
+
 // Initialize the game
 fetchArticle();
 
