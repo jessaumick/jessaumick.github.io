@@ -46,7 +46,8 @@ async function fetchArticle() {
             return;
         }
 
-        originalText = page.extract;
+        // Convert HTML to plain text
+        originalText = stripHTML(page.extract);
         console.log("Article text:", originalText);
 
         // Block out words and display the article
@@ -56,6 +57,13 @@ async function fetchArticle() {
         console.error("Error fetching article:", error);
         document.getElementById('article').innerText = "Error loading article.";
     }
+}
+
+// Function to strip HTML tags from a string
+function stripHTML(html) {
+    const div = document.createElement('div');
+    div.innerHTML = html;
+    return div.textContent || div.innerText || '';
 }
 
 // Block out words except for common ones
@@ -96,9 +104,11 @@ function guessTitle() {
 function revealArticle() {
     document.getElementById('article').innerText = originalText; // Reveal full article
     document.getElementById('result').innerHTML = `
+        <p>Article revealed!</p>
         <p><a href="https://en.wikipedia.org/wiki/${encodeURIComponent(articleTitle)}" target="_blank">${articleTitle}</a></p>
     `;
 }
 
 // Initialize the game
 fetchArticle();
+
