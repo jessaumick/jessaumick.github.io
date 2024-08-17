@@ -217,3 +217,11 @@ document.getElementById('guessBox').addEventListener('keypress', function(event)
         guessWord(); // Call the function to process the guess
     }
 });
+
+// Set the category to "Drug culture" for Weirdle mode
+function setWeirdleMode() {
+    switchCategory('Drug_culture');
+}
+
+// Add a button or a mechanism to trigger Weirdle mode
+document.getElementById('weirdleButton').addEventListener('click', setWeirdleMode);
