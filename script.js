@@ -2,17 +2,27 @@
 let originalHtml = '';
 let blockedHtml = '';
 let articleTitle = '';
+let currentCategory = 'all'; // Default category
 const commonWords = ['the', 'and', 'is', 'in', 'it', 'to', 'of', 'a', 'with']; // Common words to not block
 
 console.log("Script loaded"); // Check if script is being loaded
 
-// Fetch a random Wikipedia article
+// Fetch a random Wikipedia article based on the current category
 async function fetchArticle() {
     try {
         console.log("Fetching random article...");
 
-        // Fetch a random article title
-        const apiUrl = 'https://en.wikipedia.org/w/api.php?action=query&list=random&rnnamespace=0&rnlimit=1&format=json&origin=*';
+        let apiUrl;
+        if (currentCategory === 'all') {
+            // Fetch a random article title from all categories
+            apiUrl = 'https://en.wikipedia.org/w/api.php?action=query&list=random&rnnamespace=0&rnlimit=1&format=json&origin=*';
+        } else {
+            // Fetch a random article title from specific categories
+            const category = encodeURIComponent(currentCategory);
+            apiUrl = `https://en.wikipedia.org/w/api.php?action=query&list=random&rnnamespace=0&rnlimit=1&format=json&origin=*&rbgcategories=${category}`;
+        }
+
+        // Fetch the article title
         const response = await fetch(apiUrl);
         const data = await response.json();
 
@@ -62,16 +72,13 @@ async function fetchArticle() {
 
 // Block out words except for common ones
 function blockWords() {
-    // Create a temporary DOM element to manipulate the HTML
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = originalHtml;
 
-    // Get all text nodes
     const textNodes = Array.from(tempDiv.querySelectorAll('*')).reduce((acc, element) => {
         return acc.concat(Array.from(element.childNodes).filter(node => node.nodeType === Node.TEXT_NODE));
     }, []);
 
-    // Block out words in text nodes
     textNodes.forEach(node => {
         const text = node.textContent;
         const blockedText = text.replace(/\b\w+\b/g, (word) => {
@@ -92,11 +99,9 @@ function guessWord() {
     const guess = document.getElementById('guessBox').value.trim().toLowerCase();
     const regex = new RegExp(`\\b${guess}\\b`, 'gi');
 
-    // Create a temporary DOM element to manipulate the HTML
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = blockedHtml;
 
-    // Replace blocked words with their original versions
     Array.from(tempDiv.querySelectorAll('*')).forEach(element => {
         if (element.nodeType === Node.ELEMENT_NODE) {
             Array.from(element.childNodes).forEach(node => {
@@ -132,9 +137,17 @@ function guessTitle() {
 function revealArticle() {
     document.getElementById('article').innerHTML = originalHtml; // Reveal full article
     document.getElementById('result').innerHTML = `
+        <p>Article revealed!</p>
         <p><a href="https://en.wikipedia.org/wiki/${encodeURIComponent(articleTitle)}" target="_blank">${articleTitle}</a></p>
     `;
 }
 
+// Switch categories
+function switchCategory(category) {
+    currentCategory = category;
+    fetchArticle(); // Fetch a new article based on the selected category
+}
+
 // Initialize the game
 fetchArticle();
+
