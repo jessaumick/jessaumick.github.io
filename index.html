@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weirdle</title>
+    <title>Wikipedia Game</title>
     <style>
         #article {
             white-space: pre-wrap;
@@ -15,12 +15,19 @@
         #guessBox, #titleGuess {
             margin-top: 10px;
         }
+        .category-buttons {
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
-    <h1>weirdle</h1>
+    <h1>Wikipedia Game</h1>
+    <div class="category-buttons">
+        <button onclick="switchCategory('all')">All Categories</button>
+        <button onclick="switchCategory('Weirdle')">Weirdle</button>
+    </div>
     <div id="result"></div>
-    <div id="article"><h2 id="result"></h2>Loading article...</div>
+    <div id="article">Loading article...</div>
     <input type="text" id="guessBox" placeholder="Guess a word">
     <button onclick="guessWord()">Guess Word</button>
     <br><br>
@@ -32,4 +39,5 @@
     <script src="script.js"></script>
 </body>
 </html>
+
 
