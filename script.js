@@ -13,17 +13,20 @@ async function fetchArticle() {
         const apiUrl = 'https://en.wikipedia.org/w/api.php?action=query&list=random&rnnamespace=0&rnlimit=1&format=json&origin=*';
         const response = await fetch(apiUrl);
         const data = await response.json();
-        console.log("Random article fetched:", data);
 
+        // Log the entire response to inspect the structure
+        console.log("API Response:", data);
+
+        // Check if the response has the expected structure
         if (!data.query || !data.query.random || data.query.random.length === 0) {
-            console.error("No random articles found.");
+            console.error("No random articles found in the API response.");
+            document.getElementById('article').innerText = "No articles found.";
             return;
         }
 
         const article = data.query.random[0];
         articleTitle = article.title;
-
-        console.log("Fetching article:", articleTitle);
+        console.log("Random article title:", articleTitle);
 
         // Fetch the full text of the article
         const articleResponse = await fetch(`https://en.wikipedia.org/w/api.php?action=parse&page=${articleTitle}&prop=text&format=json&origin=*`);
@@ -31,6 +34,12 @@ async function fetchArticle() {
         console.log("Article fetched:", articleData);
 
         // Extract plain text from article
+        if (!articleData.parse || !articleData.parse.text) {
+            console.error("Article text not found.");
+            document.getElementById('article').innerText = "Article text not found.";
+            return;
+        }
+
         const htmlText = articleData.parse.text['*'];
         const parser = new DOMParser();
         const doc = parser.parseFromString(htmlText, 'text/html');
@@ -79,3 +88,4 @@ function guessTitle() {
 
 // Initialize the game
 fetchArticle();
+
