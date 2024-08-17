@@ -113,30 +113,38 @@ function guessWord() {
     const regex = new RegExp(`\\b${guess}\\b`, 'gi');
 
     const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = blockedHtml;
+    tempDiv.innerHTML = originalHtml;
 
-    Array.from(tempDiv.querySelectorAll('*')).forEach(element => {
-        if (element.nodeType === Node.ELEMENT_NODE) {
-            Array.from(element.childNodes).forEach(node => {
-                if (node.nodeType === Node.TEXT_NODE) {
-                    const originalText = originalHtml.substring(node.textContent.length, originalHtml.length);
-                    const updatedText = node.textContent.replace(regex, (match) => {
-                        // Find the corresponding original word and use it to replace the blocked text
-                        const originalWordRegex = new RegExp(`\\b${match}\\b`, 'i');
-                        const originalWordMatch = originalText.match(originalWordRegex);
-                        return originalWordMatch ? originalWordMatch[0] : match;
-                    });
-                    node.textContent = updatedText;
-                }
-            });
-        }
+    const textNodes = Array.from(tempDiv.querySelectorAll('*')).reduce((acc, element) => {
+        return acc.concat(Array.from(element.childNodes).filter(node => node.nodeType === Node.TEXT_NODE));
+    }, []);
+
+    textNodes.forEach(node => {
+        const text = node.textContent;
+        const updatedText = text.replace(regex, (match) => match);
+        node.textContent = updatedText;
+    });
+
+    // Re-block the remaining words
+    textNodes.forEach(node => {
+        const text = node.textContent;
+        const blockedText = text.replace(/\b\w+\b/g, (word) => {
+            if (commonWords.includes(word.toLowerCase()) || word.toLowerCase() === guess) {
+                return word;
+            } else {
+                return '█'.repeat(word.length);
+            }
+        });
+        node.textContent = blockedText;
     });
 
     blockedHtml = tempDiv.innerHTML;
+
     document.getElementById('article').innerHTML = `
         <h2 style="text-align: center;">${blockedTitle}</h2>
         ${blockedHtml}
     `;
+
     document.getElementById('guessBox').value = '';
 }
 
