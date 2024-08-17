@@ -6,7 +6,9 @@ const commonWords = ['the', 'and', 'is', 'in', 'it', 'to', 'of', 'a', 'with']; /
 
 // Fetch a random article from "Medical conditions" category
 async function fetchArticle() {
-    const response = await fetch('https://en.wikipedia.org/w/api.php?action=query&list=categorymembers&cmtitle=Category:Medical_conditions&cmlimit=1&format=json&origin=*');
+    const apiUrl = 'https://en.wikipedia.org/w/api.php?action=query&list=categorymembers&cmtitle=Category:Medical_conditions&cmlimit=1&format=json&origin=*';
+
+    const response = await fetch(apiUrl);
     const data = await response.json();
     const article = data.query.categorymembers[0];
     articleTitle = article.title;
@@ -58,3 +60,4 @@ function guessTitle() {
 
 // Initialize the game
 fetchArticle();
+
