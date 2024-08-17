@@ -11,14 +11,16 @@ console.log("Script loaded"); // Check if script is being loaded
 // Fetch a random Wikipedia article based on the current category
 async function fetchArticle() {
     try {
-        console.log("Fetching random article...");
+        console.log("Fetching article...");
 
         let apiUrl;
         if (currentCategory === 'all') {
+            // Fetch a completely random article
             apiUrl = 'https://en.wikipedia.org/w/api.php?action=query&list=random&rnnamespace=0&rnlimit=1&format=json&origin=*';
         } else {
+            // Fetch articles from a specific category
             const category = encodeURIComponent(currentCategory);
-            apiUrl = `https://en.wikipedia.org/w/api.php?action=query&list=random&rnnamespace=0&rnlimit=1&format=json&origin=*&rbgcategories=${category}`;
+            apiUrl = `https://en.wikipedia.org/w/api.php?action=query&list=categorymembers&cmtitle=Category:${category}&format=json&origin=*`;
         }
 
         const response = await fetch(apiUrl);
@@ -26,18 +28,34 @@ async function fetchArticle() {
 
         console.log("API Response:", data);
 
-        if (!data.query || !data.query.random || data.query.random.length === 0) {
-            console.error("No random articles found in the API response.");
-            document.getElementById('article').innerText = "No articles found.";
-            return;
+        let article;
+        if (currentCategory === 'all') {
+            // Handle the random article case
+            if (!data.query || !data.query.random || data.query.random.length === 0) {
+                console.error("No random articles found in the API response.");
+                document.getElementById('article').innerText = "No articles found.";
+                return;
+            }
+            article = data.query.random[0];
+        } else {
+            // Handle the category-based article case
+            if (!data.query || !data.query.categorymembers || data.query.categorymembers.length === 0) {
+                console.error("No articles found in the specified category.");
+                document.getElementById('article').innerText = "No articles found in the specified category.";
+                return;
+            }
+            // Randomly select one article from the list of category members
+            const randomIndex = Math.floor(Math.random() * data.query.categorymembers.length);
+            article = data.query.categorymembers[randomIndex];
         }
 
-        const article = data.query.random[0];
         articleTitle = article.title;
-        console.log("Random article title:", articleTitle);
+        console.log("Selected article title:", articleTitle);
 
-        const articleResponse = await fetch(`https://en.wikipedia.org/w/api.php?action=query&titles=${articleTitle}&prop=extracts&exintro&format=json&origin=*`);
+        // Fetch the content of the selected article
+        const articleResponse = await fetch(`https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(articleTitle)}&prop=extracts&exintro&format=json&origin=*`);
         const articleData = await articleResponse.json();
+
         console.log("Article fetched:", articleData);
 
         if (!articleData.query || !articleData.query.pages) {
@@ -60,7 +78,7 @@ async function fetchArticle() {
 
         // Block out words and display the article
         blockWords();
-        
+
         // Insert the blocked title and blocked content
         document.getElementById('article').innerHTML = `
             <h2 style="text-align: center;">${blockedTitle}</h2>
