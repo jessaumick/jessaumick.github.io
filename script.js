@@ -2,6 +2,7 @@
 let originalHtml = '';
 let blockedHtml = '';
 let articleTitle = '';
+let blockedTitle = '';
 let currentCategory = 'all'; // Default category
 const commonWords = ['the', 'and', 'is', 'in', 'it', 'to', 'of', 'a', 'with']; // Common words to not block
 
@@ -54,14 +55,15 @@ async function fetchArticle() {
 
         originalHtml = page.extract;
         blockedHtml = originalHtml;
+        blockedTitle = blockText(articleTitle);
         console.log("Article HTML:", originalHtml);
 
         // Block out words and display the article
         blockWords();
         
-        // Insert the title and blocked content
+        // Insert the blocked title and blocked content
         document.getElementById('article').innerHTML = `
-            <h2 style="text-align: center;">${articleTitle}</h2>
+            <h2 style="text-align: center;">${blockedTitle}</h2>
             ${blockedHtml}
         `;
     } catch (error) {
@@ -94,6 +96,17 @@ function blockWords() {
     blockedHtml = tempDiv.innerHTML;
 }
 
+// Block text function for titles
+function blockText(text) {
+    return text.replace(/\b\w+\b/g, (word) => {
+        if (commonWords.includes(word.toLowerCase())) {
+            return word;
+        } else {
+            return '█'.repeat(word.length);
+        }
+    });
+}
+
 // Handle word guesses
 function guessWord() {
     const guess = document.getElementById('guessBox').value.trim().toLowerCase();
@@ -116,7 +129,7 @@ function guessWord() {
 
     blockedHtml = tempDiv.innerHTML;
     document.getElementById('article').innerHTML = `
-        <h2 style="text-align: center;">${articleTitle}</h2>
+        <h2 style="text-align: center;">${blockedTitle}</h2>
         ${blockedHtml}
     `;
     document.getElementById('guessBox').value = '';
@@ -138,7 +151,10 @@ function guessTitle() {
 
 // Reveal the entire article
 function revealArticle() {
-    document.getElementById('article').innerHTML = originalHtml; // Reveal full article
+    document.getElementById('article').innerHTML = `
+        <h2 style="text-align: center;">${articleTitle}</h2>
+        ${originalHtml}
+    `; // Reveal full article with title
     document.getElementById('result').innerHTML = `
         <p>Article revealed!</p>
         <p><a href="https://en.wikipedia.org/wiki/${encodeURIComponent(articleTitle)}" target="_blank">${articleTitle}</a></p>
@@ -153,3 +169,4 @@ function switchCategory(category) {
 
 // Initialize the game
 fetchArticle();
+
