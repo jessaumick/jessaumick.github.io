@@ -78,7 +78,10 @@ function guessWord() {
 function guessTitle() {
     const guess = document.getElementById('titleGuess').value.trim();
     if (guess.toLowerCase() === articleTitle.toLowerCase()) {
-        document.getElementById('result').innerText = "Congratulations! You've guessed the article title!";
+        document.getElementById('result').innerHTML = `
+            <p>Congratulations! You've guessed the article title!</p>
+            <p>Article Title: <a href="https://en.wikipedia.org/wiki/${encodeURIComponent(articleTitle)}" target="_blank">${articleTitle}</a></p>
+        `;
         document.getElementById('article').innerText = originalText; // Reveal full article
     } else {
         document.getElementById('result').innerText = "Incorrect title guess, try again!";
@@ -88,8 +91,12 @@ function guessTitle() {
 // Reveal the entire article
 function revealArticle() {
     document.getElementById('article').innerText = originalText; // Reveal full article
-    document.getElementById('result').innerText = "Article revealed!";
+    document.getElementById('result').innerHTML = `
+        <p>Article revealed!</p>
+        <p>Article Title: <a href="https://en.wikipedia.org/wiki/${encodeURIComponent(articleTitle)}" target="_blank">${articleTitle}</a></p>
+    `;
 }
 
 // Initialize the game
 fetchArticle();
+
