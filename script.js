@@ -56,13 +56,14 @@ async function fetchArticle() {
         blockedHtml = originalHtml;
         console.log("Article HTML:", originalHtml);
 
-        // Insert the title as an <h2> within the article
-        const articleContent = `
+        // Block out words and display the article
+        blockWords();
+        
+        // Insert the title and blocked content
+        document.getElementById('article').innerHTML = `
             <h2 style="text-align: center;">${articleTitle}</h2>
             ${blockedHtml}
         `;
-
-        document.getElementById('article').innerHTML = articleContent;
     } catch (error) {
         console.error("Error fetching article:", error);
         document.getElementById('article').innerText = "Error loading article.";
@@ -114,7 +115,10 @@ function guessWord() {
     });
 
     blockedHtml = tempDiv.innerHTML;
-    document.getElementById('article').innerHTML = blockedHtml;
+    document.getElementById('article').innerHTML = `
+        <h2 style="text-align: center;">${articleTitle}</h2>
+        ${blockedHtml}
+    `;
     document.getElementById('guessBox').value = '';
 }
 
@@ -149,4 +153,3 @@ function switchCategory(category) {
 
 // Initialize the game
 fetchArticle();
-
