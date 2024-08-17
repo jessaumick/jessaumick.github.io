@@ -170,3 +170,10 @@ function switchCategory(category) {
 // Initialize the game
 fetchArticle();
 
+// Add event listener to guessBox to submit guess on Enter key press
+document.getElementById('guessBox').addEventListener('keypress', function(event) {
+    if (event.key === 'Enter') {
+        event.preventDefault(); // Prevent default form submission
+        guessWord(); // Call the function to process the guess
+    }
+});
