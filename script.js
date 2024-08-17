@@ -4,6 +4,8 @@ let blockedText = '';
 let articleTitle = '';
 const commonWords = ['the', 'and', 'is', 'in', 'it', 'to', 'of', 'a', 'with']; // Common words to not block
 
+console.log("Script loaded"); // Check if script is being loaded
+
 // Fetch a random Wikipedia article
 async function fetchArticle() {
     try {
@@ -91,5 +93,3 @@ function revealArticle() {
 
 // Initialize the game
 fetchArticle();
-
-
