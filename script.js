@@ -14,10 +14,8 @@ async function fetchArticle() {
         const response = await fetch(apiUrl);
         const data = await response.json();
 
-        // Log the entire response to inspect the structure
         console.log("API Response:", data);
 
-        // Check if the response has the expected structure
         if (!data.query || !data.query.random || data.query.random.length === 0) {
             console.error("No random articles found in the API response.");
             document.getElementById('article').innerText = "No articles found.";
@@ -33,7 +31,6 @@ async function fetchArticle() {
         const articleData = await articleResponse.json();
         console.log("Article fetched:", articleData);
 
-        // Extract plain text from article
         if (!articleData.parse || !articleData.parse.text) {
             console.error("Article text not found.");
             document.getElementById('article').innerText = "Article text not found.";
@@ -86,6 +83,13 @@ function guessTitle() {
     }
 }
 
+// Reveal the entire article
+function revealArticle() {
+    document.getElementById('article').innerText = originalText; // Reveal full article
+    document.getElementById('result').innerText = "Article revealed!";
+}
+
 // Initialize the game
 fetchArticle();
+
 
