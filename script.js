@@ -1,6 +1,6 @@
 // Global variables
-let originalText = '';
-let blockedText = '';
+let originalHtml = '';
+let blockedHtml = '';
 let articleTitle = '';
 const commonWords = ['the', 'and', 'is', 'in', 'it', 'to', 'of', 'a', 'with']; // Common words to not block
 
@@ -46,43 +46,71 @@ async function fetchArticle() {
             return;
         }
 
-        // Convert HTML to plain text
-        originalText = stripHTML(page.extract);
-        console.log("Article text:", originalText);
+        // Store HTML content
+        originalHtml = page.extract;
+        blockedHtml = originalHtml;
+        console.log("Article HTML:", originalHtml);
 
         // Block out words and display the article
         blockWords();
-        document.getElementById('article').innerText = blockedText;
+        document.getElementById('article').innerHTML = blockedHtml;
     } catch (error) {
         console.error("Error fetching article:", error);
         document.getElementById('article').innerText = "Error loading article.";
     }
 }
 
-// Function to strip HTML tags from a string
-function stripHTML(html) {
-    const div = document.createElement('div');
-    div.innerHTML = html;
-    return div.textContent || div.innerText || '';
-}
-
 // Block out words except for common ones
 function blockWords() {
-    blockedText = originalText.replace(/\b\w+\b/g, (word) => {
-        if (commonWords.includes(word.toLowerCase())) {
-            return word;
-        } else {
-            return '█'.repeat(word.length);
-        }
+    // Create a temporary DOM element to manipulate the HTML
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = originalHtml;
+
+    // Get all text nodes
+    const textNodes = Array.from(tempDiv.querySelectorAll('*')).reduce((acc, element) => {
+        return acc.concat(Array.from(element.childNodes).filter(node => node.nodeType === Node.TEXT_NODE));
+    }, []);
+
+    // Block out words in text nodes
+    textNodes.forEach(node => {
+        const text = node.textContent;
+        const blockedText = text.replace(/\b\w+\b/g, (word) => {
+            if (commonWords.includes(word.toLowerCase())) {
+                return word;
+            } else {
+                return '█'.repeat(word.length);
+            }
+        });
+        node.textContent = blockedText;
     });
+
+    blockedHtml = tempDiv.innerHTML;
 }
 
 // Handle word guesses
 function guessWord() {
     const guess = document.getElementById('guessBox').value.trim().toLowerCase();
     const regex = new RegExp(`\\b${guess}\\b`, 'gi');
-    blockedText = blockedText.replace(regex, (match) => originalText.match(new RegExp(`\\b${match}\\b`, 'i'))[0]);
-    document.getElementById('article').innerText = blockedText;
+
+    // Create a temporary DOM element to manipulate the HTML
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = blockedHtml;
+
+    // Replace blocked words with their original versions
+    Array.from(tempDiv.querySelectorAll('*')).forEach(element => {
+        if (element.nodeType === Node.ELEMENT_NODE) {
+            Array.from(element.childNodes).forEach(node => {
+                if (node.nodeType === Node.TEXT_NODE) {
+                    const text = node.textContent;
+                    const updatedText = text.replace(regex, (match) => originalHtml.match(new RegExp(`\\b${match}\\b`, 'i'))[0]);
+                    node.textContent = updatedText;
+                }
+            });
+        }
+    });
+
+    blockedHtml = tempDiv.innerHTML;
+    document.getElementById('article').innerHTML = blockedHtml;
     document.getElementById('guessBox').value = '';
 }
 
@@ -94,7 +122,7 @@ function guessTitle() {
             <p>Congratulations! You've guessed the article title!</p>
             <p>Article Title: <a href="https://en.wikipedia.org/wiki/${encodeURIComponent(articleTitle)}" target="_blank">${articleTitle}</a></p>
         `;
-        document.getElementById('article').innerText = originalText; // Reveal full article
+        document.getElementById('article').innerHTML = originalHtml; // Reveal full article
     } else {
         document.getElementById('result').innerText = "Incorrect title guess, try again!";
     }
@@ -102,7 +130,7 @@ function guessTitle() {
 
 // Reveal the entire article
 function revealArticle() {
-    document.getElementById('article').innerText = originalText; // Reveal full article
+    document.getElementById('article').innerHTML = originalHtml; // Reveal full article
     document.getElementById('result').innerHTML = `
         <p>Article revealed!</p>
         <p><a href="https://en.wikipedia.org/wiki/${encodeURIComponent(articleTitle)}" target="_blank">${articleTitle}</a></p>
@@ -111,4 +139,3 @@ function revealArticle() {
 
 // Initialize the game
 fetchArticle();
-
