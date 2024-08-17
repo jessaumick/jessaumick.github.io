@@ -96,7 +96,6 @@ function guessTitle() {
 function revealArticle() {
     document.getElementById('article').innerText = originalText; // Reveal full article
     document.getElementById('result').innerHTML = `
-        <p>Article revealed!</p>
         <p><a href="https://en.wikipedia.org/wiki/${encodeURIComponent(articleTitle)}" target="_blank">${articleTitle}</a></p>
     `;
 }
