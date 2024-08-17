@@ -99,4 +99,3 @@ function revealArticle() {
 
 // Initialize the game
 fetchArticle();
-
