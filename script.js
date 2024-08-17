@@ -14,15 +14,12 @@ async function fetchArticle() {
 
         let apiUrl;
         if (currentCategory === 'all') {
-            // Fetch a random article title from all categories
             apiUrl = 'https://en.wikipedia.org/w/api.php?action=query&list=random&rnnamespace=0&rnlimit=1&format=json&origin=*';
         } else {
-            // Fetch a random article title from specific categories
             const category = encodeURIComponent(currentCategory);
             apiUrl = `https://en.wikipedia.org/w/api.php?action=query&list=random&rnnamespace=0&rnlimit=1&format=json&origin=*&rbgcategories=${category}`;
         }
 
-        // Fetch the article title
         const response = await fetch(apiUrl);
         const data = await response.json();
 
@@ -38,7 +35,6 @@ async function fetchArticle() {
         articleTitle = article.title;
         console.log("Random article title:", articleTitle);
 
-        // Fetch the lead section of the article
         const articleResponse = await fetch(`https://en.wikipedia.org/w/api.php?action=query&titles=${articleTitle}&prop=extracts&exintro&format=json&origin=*`);
         const articleData = await articleResponse.json();
         console.log("Article fetched:", articleData);
@@ -56,14 +52,17 @@ async function fetchArticle() {
             return;
         }
 
-        // Store HTML content
         originalHtml = page.extract;
         blockedHtml = originalHtml;
         console.log("Article HTML:", originalHtml);
 
-        // Block out words and display the article
-        blockWords();
-        document.getElementById('article').innerHTML = blockedHtml;
+        // Insert the title as an <h2> within the article
+        const articleContent = `
+            <h2 style="text-align: center;">${articleTitle}</h2>
+            ${blockedHtml}
+        `;
+
+        document.getElementById('article').innerHTML = articleContent;
     } catch (error) {
         console.error("Error fetching article:", error);
         document.getElementById('article').innerText = "Error loading article.";
