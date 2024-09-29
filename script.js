@@ -12,7 +12,6 @@ console.log("Script loaded"); // Check if script is being loaded
 async function fetchArticle() {
     try {
         console.log("Fetching article...");
-        console.log("Current category:", currentCategory);
 
         let apiUrl;
         if (currentCategory === 'all') {
@@ -20,18 +19,71 @@ async function fetchArticle() {
             apiUrl = 'https://en.wikipedia.org/w/api.php?action=query&list=random&rnnamespace=0&rnlimit=1&format=json&origin=*';
         } else {
             // Fetch articles from a specific category
-            const category = encodeURIComponent(`Category:${currentCategory}`);
-            apiUrl = `https://en.wikipedia.org/w/api.php?action=query&list=categorymembers&cmtitle=${category}&cmtype=page&cmlimit=50&format=json&origin=*`;
+            const category = encodeURIComponent(currentCategory);
+            apiUrl = `https://en.wikipedia.org/w/api.php?action=query&list=categorymembers&cmtitle=Category:${category}&format=json&origin=*`;
         }
-
-        console.log("API URL:", apiUrl);
 
         const response = await fetch(apiUrl);
         const data = await response.json();
 
-        console.log("API Response:", JSON.stringify(data, null, 2));
+        console.log("API Response:", data);
 
-        // Rest of the function remains the same...
+        let article;
+        if (currentCategory === 'all') {
+            // Handle the random article case
+            if (!data.query || !data.query.random || data.query.random.length === 0) {
+                console.error("No random articles found in the API response.");
+                document.getElementById('article').innerText = "No articles found.";
+                return;
+            }
+            article = data.query.random[0];
+        } else {
+            // Handle the category-based article case
+            if (!data.query || !data.query.categorymembers || data.query.categorymembers.length === 0) {
+                console.error("No articles found in the specified category.");
+                document.getElementById('article').innerText = "No articles found in the specified category.";
+                return;
+            }
+            // Randomly select one article from the list of category members
+            const randomIndex = Math.floor(Math.random() * data.query.categorymembers.length);
+            article = data.query.categorymembers[randomIndex];
+        }
+
+        articleTitle = article.title;
+        console.log("Selected article title:", articleTitle);
+
+        // Fetch the content of the selected article
+        const articleResponse = await fetch(`https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(articleTitle)}&prop=extracts&exintro&format=json&origin=*`);
+        const articleData = await articleResponse.json();
+
+        console.log("Article fetched:", articleData);
+
+        if (!articleData.query || !articleData.query.pages) {
+            console.error("Article text not found.");
+            document.getElementById('article').innerText = "Article text not found.";
+            return;
+        }
+
+        const page = Object.values(articleData.query.pages)[0];
+        if (!page.extract) {
+            console.error("Extract not found.");
+            document.getElementById('article').innerText = "Extract not found.";
+            return;
+        }
+
+        originalHtml = page.extract;
+        blockedHtml = originalHtml;
+        blockedTitle = blockText(articleTitle);
+        console.log("Article HTML:", originalHtml);
+
+        // Block out words and display the article
+        blockWords();
+
+        // Insert the blocked title and blocked content
+        document.getElementById('article').innerHTML = `
+            <h2 style="text-align: center;">${blockedTitle}</h2>
+            ${blockedHtml}
+        `;
     } catch (error) {
         console.error("Error fetching article:", error);
         document.getElementById('article').innerText = "Error loading article.";
@@ -121,6 +173,7 @@ function guessWord() {
 
     document.getElementById('guessBox').value = '';
 }
+
 
 // Handle title guess
 function guessTitle() {
