@@ -18,9 +18,9 @@ async function fetchArticle() {
             // Fetch a completely random article
             apiUrl = 'https://en.wikipedia.org/w/api.php?action=query&list=random&rnnamespace=0&rnlimit=1&format=json&origin=*';
         } else {
-            // Fetch articles from a specific category
+            // Fetch articles from a specific category (increase limit)
             const category = encodeURIComponent(currentCategory);
-            apiUrl = `https://en.wikipedia.org/w/api.php?action=query&list=categorymembers&cmtitle=Category:${category}&format=json&origin=*`;
+            apiUrl = `https://en.wikipedia.org/w/api.php?action=query&list=categorymembers&cmtitle=Category:${category}&cmlimit=50&format=json&origin=*`;
         }
 
         const response = await fetch(apiUrl);
@@ -44,9 +44,18 @@ async function fetchArticle() {
                 document.getElementById('article').innerText = "No articles found in the specified category.";
                 return;
             }
-            // Randomly select one article from the list of category members
-            const randomIndex = Math.floor(Math.random() * data.query.categorymembers.length);
-            article = data.query.categorymembers[randomIndex];
+
+            // Filter out non-articles (categories, redirects)
+            const validArticles = data.query.categorymembers.filter(member => member.ns === 0);
+            if (validArticles.length === 0) {
+                console.error("No valid articles found in the specified category.");
+                document.getElementById('article').innerText = "No valid articles found in the specified category.";
+                return;
+            }
+
+            // Randomly select one article from the list of valid category members
+            const randomIndex = Math.floor(Math.random() * validArticles.length);
+            article = validArticles[randomIndex];
         }
 
         articleTitle = article.title;
@@ -89,6 +98,7 @@ async function fetchArticle() {
         document.getElementById('article').innerText = "Error loading article.";
     }
 }
+
 
 // Block out words except for common ones
 function blockWords() {
