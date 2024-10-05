@@ -61,12 +61,14 @@ async function fetchArticle() {
             return;
         }
 
+        // Article with an extract found, process and block words
         originalHtml = articleWithExtract.extract;
-        blockedHtml = originalHtml;
-        blockedTitle = blockText(articleTitle);
-        console.log("Article HTML:", originalHtml);
+        blockedHtml = originalHtml; // Copy original extract
+        blockedTitle = blockText(articleTitle); // Block the article title
 
-        // Block out words and display the article
+        console.log("Original Article HTML:", originalHtml);
+
+        // Block out words in the article body
         blockWords();
 
         // Insert the blocked title and blocked content
