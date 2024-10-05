@@ -9,6 +9,7 @@ const commonWords = ['the', 'and', 'is', 'in', 'it', 'to', 'of', 'a', 'with']; /
 console.log("Script loaded"); // Check if script is being loaded
 
 // Fetch a random Wikipedia article based on the current category
+// Log the full API response in case of errors
 async function fetchArticle() {
     try {
         console.log("Fetching article...");
@@ -20,13 +21,14 @@ async function fetchArticle() {
         } else {
             // Fetch articles from a specific category
             const category = encodeURIComponent(currentCategory);
-            apiUrl = `https://en.wikipedia.org/w/api.php?action=query&list=categorymembers&cmtitle=Category:${category}&format=json&origin=*`;
+            apiUrl = `https://en.wikipedia.org/w/api.php?action=query&list=categorymembers&cmtitle=Category:${category}&cmlimit=500&format=json&origin=*`;
         }
 
         const response = await fetch(apiUrl);
         const data = await response.json();
 
-        console.log("API Response:", data);
+        // Log full response for debugging
+        console.log("Full API Response:", data);
 
         let article;
         if (currentCategory === 'all') {
