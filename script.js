@@ -9,7 +9,6 @@ const commonWords = ['the', 'and', 'is', 'in', 'it', 'to', 'of', 'a', 'with']; /
 console.log("Script loaded"); // Check if script is being loaded
 
 // Fetch a random Wikipedia article based on the "Drug culture" category
-// Log the full API response in case of errors
 async function fetchArticle() {
     try {
         console.log("Fetching article...");
@@ -31,33 +30,38 @@ async function fetchArticle() {
             return;
         }
 
-        // Randomly select one article from the list of category members
-        const randomIndex = Math.floor(Math.random() * data.query.categorymembers.length);
-        const article = data.query.categorymembers[randomIndex];
+        let articleWithExtract = null;
 
-        articleTitle = article.title;
-        console.log("Selected article title:", articleTitle);
+        // Loop through articles until we find one with an extract
+        for (let i = 0; i < data.query.categorymembers.length; i++) {
+            const article = data.query.categorymembers[i];
+            articleTitle = article.title;
+            console.log("Attempting article:", articleTitle);
 
-        // Fetch the content of the selected article
-        const articleResponse = await fetch(`https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(articleTitle)}&prop=extracts&exintro&format=json&origin=*`);
-        const articleData = await articleResponse.json();
+            // Fetch the content of the selected article
+            const articleResponse = await fetch(`https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(articleTitle)}&prop=extracts&exintro&explaintext=true&format=json&origin=*`);
+            const articleData = await articleResponse.json();
 
-        console.log("Article fetched:", articleData);
+            if (!articleData.query || !articleData.query.pages) {
+                console.warn("Article text not found for:", articleTitle);
+                continue;  // Skip to the next article
+            }
 
-        if (!articleData.query || !articleData.query.pages) {
-            console.error("Article text not found.");
-            document.getElementById('article').innerText = "Article text not found.";
+            const page = Object.values(articleData.query.pages)[0];
+            if (page.extract) {
+                articleWithExtract = page;
+                break;  // Exit the loop once an article with an extract is found
+            }
+        }
+
+        // If no article with extract was found
+        if (!articleWithExtract) {
+            console.error("No article with an extract found.");
+            document.getElementById('article').innerText = "No articles with an extract found in the specified category.";
             return;
         }
 
-        const page = Object.values(articleData.query.pages)[0];
-        if (!page.extract) {
-            console.error("Extract not found.");
-            document.getElementById('article').innerText = "Extract not found.";
-            return;
-        }
-
-        originalHtml = page.extract;
+        originalHtml = articleWithExtract.extract;
         blockedHtml = originalHtml;
         blockedTitle = blockText(articleTitle);
         console.log("Article HTML:", originalHtml);
@@ -70,6 +74,7 @@ async function fetchArticle() {
             <h2 style="text-align: center;">${blockedTitle}</h2>
             ${blockedHtml}
         `;
+
     } catch (error) {
         console.error("Error fetching article:", error);
         document.getElementById('article').innerText = "Error loading article.";
