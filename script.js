@@ -222,7 +222,7 @@ document.getElementById('guessBox').addEventListener('keypress', function(event)
 
 // Set the category to "Drug culture" for Weirdle mode
 function setWeirdleMode() {
-    switchCategory('Technology');
+    switchCategory('Drug_culture');
 }
 
 // Add a button or a mechanism to trigger Weirdle mode
