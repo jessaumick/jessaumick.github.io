@@ -19,6 +19,9 @@
         #guessBox, #titleGuess {
             margin-top: 10px;
         }
+        .main-content {
+            display: flex;
+        }
         .guesses {
             display: flex;
             flex-direction: column;
@@ -27,15 +30,17 @@
 </head>
 <body>
     <h1>Weirdle</h1>
-    <div id="article">Loading article...</div>
-    <div id="guesses">
-        <input type="text" id="titleGuess" placeholder="Guess the title">
-        <button onclick="guessTitle()">Guess Title</button>
-        <br><br>
-        <input type="text" id="guessBox" placeholder="Guess a word">
-        <button onclick="guessWord()">Guess Word</button>
-        <br><br>
-        <button onclick="revealArticle()">Reveal Article</button>
+    <div id="main-content">
+        <div id="article">Loading article...</div>
+        <div id="guesses">
+            <input type="text" id="titleGuess" placeholder="Guess the title">
+            <button onclick="guessTitle()">Guess Title</button>
+            <br><br>
+            <input type="text" id="guessBox" placeholder="Guess a word">
+            <button onclick="guessWord()">Guess Word</button>
+            <br><br>
+            <button onclick="revealArticle()">Reveal Article</button>
+        </div>
     </div>
     <div id="result"></div>
 
