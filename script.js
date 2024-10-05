@@ -3,26 +3,20 @@ let originalHtml = '';
 let blockedHtml = '';
 let articleTitle = '';
 let blockedTitle = '';
-let currentCategory = 'all'; // Default category
+const currentCategory = 'Drug_culture'; // Default category is now Drug culture
 const commonWords = ['the', 'and', 'is', 'in', 'it', 'to', 'of', 'a', 'with']; // Common words to not block
 
 console.log("Script loaded"); // Check if script is being loaded
 
-// Fetch a random Wikipedia article based on the current category
+// Fetch a random Wikipedia article based on the "Drug culture" category
 // Log the full API response in case of errors
 async function fetchArticle() {
     try {
         console.log("Fetching article...");
 
-        let apiUrl;
-        if (currentCategory === 'all') {
-            // Fetch a completely random article
-            apiUrl = 'https://en.wikipedia.org/w/api.php?action=query&list=random&rnnamespace=0&rnlimit=1&format=json&origin=*';
-        } else {
-            // Fetch articles from a specific category
-            const category = encodeURIComponent(currentCategory);
-            apiUrl = `https://en.wikipedia.org/w/api.php?action=query&list=categorymembers&cmtitle=Category:${category}&cmlimit=500&format=json&origin=*`;
-        }
+        // Fetch articles from the "Drug culture" category
+        const category = encodeURIComponent(currentCategory);
+        const apiUrl = `https://en.wikipedia.org/w/api.php?action=query&list=categorymembers&cmtitle=Category:${category}&cmlimit=500&format=json&origin=*`;
 
         const response = await fetch(apiUrl);
         const data = await response.json();
@@ -30,26 +24,16 @@ async function fetchArticle() {
         // Log full response for debugging
         console.log("Full API Response:", data);
 
-        let article;
-        if (currentCategory === 'all') {
-            // Handle the random article case
-            if (!data.query || !data.query.random || data.query.random.length === 0) {
-                console.error("No random articles found in the API response.");
-                document.getElementById('article').innerText = "No articles found.";
-                return;
-            }
-            article = data.query.random[0];
-        } else {
-            // Handle the category-based article case
-            if (!data.query || !data.query.categorymembers || data.query.categorymembers.length === 0) {
-                console.error("No articles found in the specified category.");
-                document.getElementById('article').innerText = "No articles found in the specified category.";
-                return;
-            }
-            // Randomly select one article from the list of category members
-            const randomIndex = Math.floor(Math.random() * data.query.categorymembers.length);
-            article = data.query.categorymembers[randomIndex];
+        // Handle the category-based article case
+        if (!data.query || !data.query.categorymembers || data.query.categorymembers.length === 0) {
+            console.error("No articles found in the specified category.");
+            document.getElementById('article').innerText = "No articles found in the specified category.";
+            return;
         }
+
+        // Randomly select one article from the list of category members
+        const randomIndex = Math.floor(Math.random() * data.query.categorymembers.length);
+        const article = data.query.categorymembers[randomIndex];
 
         articleTitle = article.title;
         console.log("Selected article title:", articleTitle);
@@ -203,13 +187,7 @@ function revealArticle() {
     `;
 }
 
-// Switch categories
-function switchCategory(category) {
-    currentCategory = category;
-    fetchArticle(); // Fetch a new article based on the selected category
-}
-
-// Initialize the game
+// Initialize the game by fetching the first article from the "Drug culture" category
 fetchArticle();
 
 // Add event listener to guessBox to submit guess on Enter key press
@@ -219,11 +197,3 @@ document.getElementById('guessBox').addEventListener('keypress', function(event)
         guessWord(); // Call the function to process the guess
     }
 });
-
-// Set the category to "Drug culture" for Weirdle mode
-function setWeirdleMode() {
-    switchCategory('Drug_culture');
-}
-
-// Add a button or a mechanism to trigger Weirdle mode
-document.getElementById('weirdleButton').addEventListener('click', setWeirdleMode);
