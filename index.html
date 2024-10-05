@@ -19,21 +19,24 @@
         #guessBox, #titleGuess {
             margin-top: 10px;
         }
-        .category-buttons {
-            margin-bottom: 10px;
+        .guesses {
+            display: flex;
+            flex-direction: column;
         }
     </style>
 </head>
 <body>
     <h1>Weirdle</h1>
     <div id="article">Loading article...</div>
-    <input type="text" id="titleGuess" placeholder="Guess the title">
-    <button onclick="guessTitle()">Guess Title</button>
-    <br><br>
-    <input type="text" id="guessBox" placeholder="Guess a word">
-    <button onclick="guessWord()">Guess Word</button>
-    <br><br>
-    <button onclick="revealArticle()">Reveal Article</button>
+    <div id="guesses">
+        <input type="text" id="titleGuess" placeholder="Guess the title">
+        <button onclick="guessTitle()">Guess Title</button>
+        <br><br>
+        <input type="text" id="guessBox" placeholder="Guess a word">
+        <button onclick="guessWord()">Guess Word</button>
+        <br><br>
+        <button onclick="revealArticle()">Reveal Article</button>
+    </div>
     <div id="result"></div>
 
     <script src="script.js"></script>
