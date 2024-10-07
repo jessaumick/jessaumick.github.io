@@ -182,8 +182,7 @@ function revealArticle() {
         ${originalHtml}
     `; // Reveal full article with title
     document.getElementById('result').innerHTML = `
-        <p>Article revealed!</p>
-        <p><a href="https://en.wikipedia.org/wiki/${encodeURIComponent(articleTitle)}" target="_blank">${articleTitle}</a></p>
+        <center><p><a href="https://en.wikipedia.org/wiki/${encodeURIComponent(articleTitle)}" target="_blank">${articleTitle}</a></p></center>
     `;
 }
 
